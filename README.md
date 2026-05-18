@@ -1,7 +1,7 @@
-# 🌍 GraphMet: Learning Spectral Compositional Koopman Operators for Global-to-Regional Weather Forecasting
+# Learning Spectral Compositional Koopman Operators for Global-to-Regional Weather Forecasting
 
 Official anonymous implementation of the paper:
-**GraphMet: Learning Spectral Compositional Koopman Operators for Global-to-Regional Weather Forecasting** — *Anonymous Submission*.
+**Learning Spectral Compositional Koopman Operators for Global-to-Regional Weather Forecasting** — *Anonymous Submission*.
 
 Anonymous code repository: <https://anonymous.4open.science/w/GraphMet-54ED/>
 

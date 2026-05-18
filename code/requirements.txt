@@ -1,0 +1,6 @@
+torch>=2.1
+numpy>=1.24
+xarray>=2023.10        # optional; falls back to synthetic mode when missing
+zarr>=2.16             # optional; only needed for ERA5/CERRA real data
+netCDF4>=1.6           # optional; same as above
+pyyaml>=6.0

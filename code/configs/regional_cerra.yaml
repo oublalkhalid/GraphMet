@@ -1,0 +1,14 @@
+# GraphMet — Stage 2: regional fine-tuning on CERRA (5 km)
+data: /path/to/cerra
+pretrained: checkpoints/graphmet_global.pt
+refine: 6
+bs: 4
+steps: 50000
+lr: 5.0e-5
+lr_min: 1.0e-6
+xi1: 1.0e-3
+xi2: 1.0
+freeze_encoder: true
+seed: 0
+log_every: 50
+ckpt: checkpoints/graphmet_regional.pt

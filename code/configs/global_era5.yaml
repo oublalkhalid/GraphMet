@@ -1,0 +1,15 @@
+# GraphMet — Stage 1: global pretraining on ERA5
+data: /path/to/era5         # zarr or netCDF root, or "synthetic"
+refine: 6                   # icosahedral refinements (40,962 mesh nodes)
+m: 32                       # per-node latent sub-embedding dimension
+mesh_feat: 128
+hidden: 256
+bs: 8
+steps: 500000
+lr: 1.0e-4
+lr_min: 1.0e-6
+xi1: 1.0e-3
+xi2: 1.0
+seed: 0
+log_every: 100
+ckpt: checkpoints/graphmet_global.pt
