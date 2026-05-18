@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="GraphMet: Learning Spectral Compositional Koopman Operators for Global-to-Regional Weather Forecasting." />
+  <meta property="og:title" content="GraphMet | Anonymous Submission" />
+  <meta property="og:description" content="Learning Spectral Compositional Koopman Operators for Global-to-Regional Weather Forecasting" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="static/images/overview_graphmet.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="GraphMet | Anonymous Submission" />
+  <meta name="twitter:description" content="Spectral Compositional Koopman Operators for Global-to-Regional Weather Forecasting" />
+  <meta name="twitter:image" content="static/images/overview_graphmet.png" />
+  <meta name="keywords" content="weather forecasting, Koopman operator, graph neural networks, MLWP, climate AI, regional forecasting, GraphCast, GenCast, AIFS" />
+
+  <title>GraphMet | Spectral Koopman Weather Forecasting</title>
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico" />
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans:400,500,700|Noto+Sans:400,500,700|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <link rel="stylesheet" href="static/css/custom.css">
+
+  <!-- ── MathJax (LaTeX rendering for inline \( … \) and display \[ … \]) ── -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true,
+        tags: 'none'
+      },
+      svg: { fontCache: 'global' },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --brand: #2c5ea8;
+      --brand-dark: #1a3d72;
+      --accent: #5fb8a5;
+      --bg-soft: #f5f8fc;
+      --border: #e3eaf2;
+      --text-soft: #5b6573;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans", sans-serif;
+      color: #1f2937;
+      background: white;
+    }
+    .publication-title {
+      font-family: "Google Sans", sans-serif;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .hero-gradient {
+      background: linear-gradient(180deg, #f4f9ff 0%, #ffffff 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      border: 1px solid #d1ddec;
+      border-radius: 999px;
+      padding: .35rem .75rem;
+      font-size: .9rem;
+      color: #334155;
+      background: #fff;
+      margin: .25rem;
+    }
+    .paper-links .button {
+      margin: .3rem;
+      border-radius: 999px;
+    }
+    .paper-links .button.is-primary {
+      background: var(--brand);
+    }
+    .paper-links .button.is-primary:hover { background: var(--brand-dark); }
+    .teaser-card, .content-card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    }
+    .teaser-card { padding: 1rem; }
+    .content-card { padding: 1.25rem 1.25rem 1rem; }
+    .section-soft { background: var(--bg-soft); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .section-title {
+      font-family: "Google Sans", sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: .75rem;
+    }
+    .muted { color: var(--text-soft); }
+    .authors .author-block { white-space: nowrap; }
+    .authors .author-block a { color: #1f2937; }
+    .authors .author-block a:hover { color: var(--brand); text-decoration: underline; }
+    .figure-box {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: .75rem;
+      background: #fff;
+    }
+    .figure-caption {
+      font-size: .9rem;
+      color: var(--text-soft);
+      margin-top: .5rem;
+      line-height: 1.5;
+    }
+    .quick-grid .box {
+      height: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: none;
+      background: #fff;
+    }
+    .metric-chip {
+      display:inline-block; margin:.2rem .35rem .2rem 0; padding:.25rem .55rem;
+      border-radius:999px; border:1px solid #d1ddec; background:#fafdff; font-size:.82rem; color:#334155;
+    }
+    .equation-box {
+      background: #f8fafc;
+      border-left: 4px solid var(--brand);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      font-size: 1.02rem;
+      margin: 1rem 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+    /* MathJax tweaks */
+    mjx-container { font-size: 1.05em !important; }
+    mjx-container[display="true"] { margin: .6em 0 !important; }
+    pre code {
+      display:block; overflow-x:auto; white-space:pre; border-radius:12px;
+      background:#0f172a; color:#e2e8f0; padding:1rem;
+      font-size:.85rem;
+    }
+    .footer { border-top: 1px solid var(--border); background: #fff; }
+    .nav-anchor { color: var(--brand); font-weight: 500; margin: 0 .6rem; }
+    .stat-card {
+      text-align: center;
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      height: 100%;
+    }
+    .stat-number {
+      font-family: "Google Sans", sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--brand);
+      line-height: 1.1;
+    }
+    .stat-label {
+      font-size: .9rem;
+      color: var(--text-soft);
+      margin-top: .25rem;
+    }
+    .koopman-title { color: var(--brand); }
+    .spectral-title { color: var(--accent); }
+
+    /* ── Small inline notice ─────────────────────────────────────── */
+    .notice-inline {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      max-width: 900px;
+      margin: 1.25rem auto 0;
+      padding: .55rem .9rem;
+      font-size: .82rem;
+      color: #d70505;
+      background: #fbfcfe;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      line-height: 1.45;
+    }
+    .notice-inline .notice-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+      color: var(--accent);
+    }
+
+    /* ── Image lightbox / zoom ───────────────────────────────────── */
+    .figure-box img,
+    .content-card img {
+      cursor: zoom-in;
+      transition: transform .15s ease;
+    }
+    .figure-box img:hover,
+    .content-card img:hover {
+      transform: scale(1.01);
+    }
+    /* Don't zoom comparison-slider images (they have their own UI) */
+    .image-comparison img {
+      cursor: ew-resize !important;
+    }
+    .image-comparison img:hover {
+      transform: none !important;
+    }
+
+    #lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 14, 24, 0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      cursor: zoom-out;
+      padding: 2rem;
+      animation: lightboxFadeIn .18s ease-out;
+    }
+    #lightbox-overlay.is-active { display: flex; }
+    #lightbox-overlay img {
+      max-width: 95vw;
+      max-height: 92vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+      transition: transform .25s ease;
+      transform-origin: center center;
+      cursor: zoom-in;
+    }
+    #lightbox-overlay img.is-zoomed {
+      max-width: none;
+      max-height: none;
+      cursor: zoom-out;
+    }
+    #lightbox-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.5rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s ease;
+    }
+    #lightbox-close:hover { background: rgba(255, 255, 255, 0.25); }
+    #lightbox-caption {
+      position: absolute;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #e2e8f0;
+      font-size: .9rem;
+      background: rgba(0, 0, 0, 0.45);
+      padding: .5rem 1rem;
+      border-radius: 999px;
+      max-width: 80vw;
+      text-align: center;
+    }
+    @keyframes lightboxFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .publication-title { font-size: 2rem !important; }
+      .authors { font-size: 1rem !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero hero-gradient">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="has-text-centered">
+          <div class="mb-4">
+            <span class="badge"><i class="fas fa-globe"></i> Weather Forecasting</span>
+            <span class="badge"><i class="fas fa-project-diagram"></i> Graph Neural Networks</span>
+            <span class="badge"><i class="fas fa-wave-square"></i> Koopman Operator Theory</span>
+            <span class="badge"><i class="fas fa-mountain"></i> Global-to-Regional</span>
+          </div>
+
+          <h1 class="title is-3 publication-title">
+            <span style="font-weight:800;">Learning Spectral Compositional Koopman Operators for Global-to-Regional Weather Forecasting</span>
+          </h1>
+
+          <div class="is-size-5 authors mt-4">
+            <span class="author-block">Anonymous Authors</span>
+          </div>
+          <!-- <div class="is-size-5 mt-2 muted">Anonymous Institution</div> -->
+          <div class="is-size-5 mt-2"><strong>Under Review</strong></div>
+          <div class="is-size-7 muted mt-1">Submission under double-blind review</div>
+
+          <div class="paper-links mt-5">
+            <a class="button is-primary is-rounded" href="#" target="_blank">
+              <span class="icon"><i class="fas fa-file-pdf"></i></span><span>Paper (PDF)</span>
+            </a>
+            <a class="button is-dark is-rounded" href="https://anonymous.4open.science/w/GraphMet-54ED/" target="_blank">
+              <span class="icon"><i class="fab fa-github"></i></span><span>Anonymous Code</span>
+            </a>
+            <a class="button is-light is-rounded" href="#bibtex">
+              <span class="icon"><i class="fas fa-quote-right"></i></span><span>BibTeX</span>
+            </a>
+          </div>
+
+          <div class="mt-4">
+            <a class="nav-anchor" href="#overview">Overview</a>
+            <a class="nav-anchor" href="#motivation">Motivation</a>
+            <a class="nav-anchor" href="#method">Method</a>
+            <a class="nav-anchor" href="#results">Benchmark Results</a>
+            <a class="nav-anchor" href="#analysis">Animations</a>
+            <!-- <a class="nav-anchor" href="#bibtex">BibTeX</a> -->
+          </div>
+        </div>
+                <!-- Small notice about figure quality -->
+        <div class="notice-inline">
+          <span class="notice-icon">⚠️</span>
+          <span>
+          Some weather forecasting figures may appear degraded due to OpenReview’s PDF compression regardless of the resolution of the submitted file. High-resolution versions are available below with zooming tools 🔎. Please not that, this is fixed in the revised version.</span>
+        </div>
+
+        <!-- ── Unified Abstract + Overview + Key Results ─────────── -->
+        <div class="mt-6 teaser-card" id="overview" style="padding: 2rem;">
+
+          <h2 class="title is-4 section-title mb-3 has-text-centered">Abstract</h2>
+          <p class="is-size-6" style="text-align: justify;">
+            State-of-the-art machine learning weather prediction systems achieve strong upper-air forecast skill but degrade at longer lead times, with mesoscale structures progressively vanishing and ensemble forecasts becoming under-dispersive. While these limitations are often attributed to the training objective, we find that <strong>message-passing processors</strong> significantly contribute to this degradation: repeated neighbourhood aggregation at each autoregressive step acts as a smoothing operator that, over rollout steps, suppresses high-frequency information in latent space. This effect is particularly limiting in regional weather prediction, where fine-scale structures are already partially unresolved, further eroding mesoscale variability and hindering long-horizon forecasting.
+            We propose <strong>GraphMet</strong>, a graph-based weather model motivated by Koopman theory that replaces stacked message-passing layers with a <strong>single linear Koopman operator step</strong>. GraphMet learns linear evolution in a spectral latent basis while preserving the encoder, decoder, and multi-scale icosahedral mesh structure. A two-term spectral objective jointly learns a stable Koopman basis and preserves latent geometry, enabling efficient long-range propagation without repeated nonlinear aggregation. Empirically, GraphMet reduces the 15-day activity deficit, improves regional RMSE by 11–14% at 5&nbsp;km resolution, and enables efficient probabilistic forecasting at substantially lower inference cost than strong baselines.
+            Code available at <a href="https://anonymous.4open.science/w/GraphMet-54ED/" target="_blank">anonymous.4open.science/w/GraphMet-54ED/</a>.
+          </p>
+
+          <div class="has-text-centered mt-3">
+            <span class="metric-chip">Global + regional forecasting</span>
+            <span class="metric-chip">5&nbsp;km resolution (CERRA)</span>
+            <span class="metric-chip">14,336 Koopman parameters</span>
+            <span class="metric-chip">Analytic probabilistic forecasts</span>
+          </div>
+
+          <!-- Overview figure -->
+          <div class="figure-box has-text-centered mt-5" style="border: none; box-shadow: none; padding: 0;">
+            <img src="static/images/overview_graphmet.png"
+                 alt="Overview of GraphMet"
+                 style="width: 100%; max-width: 1100px; border-radius: 10px; display: inline-block;">
+            <div class="figure-caption">
+              <strong>Overview of GraphMet.</strong>
+              <strong>(A)</strong> Global forecasting from state \(\mathbf{x}^{t}\) using a multiscale icosahedral mesh encoder (levels 0–6), <strong>latent Koopman dynamics</strong>, and a decoder for next-state prediction.
+              <strong>(B)</strong> Prediction example comparing oversmoothing of <em>GraphCast</em> against <em>GraphMet</em> and ERA5, supported by the spectral analysis on the right.
+              <strong>(C)</strong> ECMWF-ENS and GraphMet-ENS forecasts for Tropical Cyclone Narelle (Australia, March 2026), showing 50-member ensemble tracks with the deterministic IFS track in black.
+            </div>
+          </div>
+
+          <!-- Key result chips -->
+          <div class="columns is-multiline mt-5">
+            <div class="column is-3"><div class="stat-card"><div class="stat-number">32%</div><div class="stat-label">15-day activity-deficit reduction</div></div></div>
+            <div class="column is-3"><div class="stat-card"><div class="stat-number">11–14%</div><div class="stat-label">Regional RMSE improvement at 5&nbsp;km</div></div></div>
+            <div class="column is-3"><div class="stat-card"><div class="stat-number">14×</div><div class="stat-label">Lower inference cost vs. GenCast</div></div></div>
+            <div class="column is-3"><div class="stat-card"><div class="stat-number">0.83</div><div class="stat-label">Latent isotropy \(\lambda^{+}_{\min}\) (vs \(\sim 10^{-2}\) for deep MP)</div></div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── REGIONAL FORECASTS ───────────────────────── -->
+  <section class="section" id="regional">
+    <div class="container is-max-desktop">
+            <!-- Block 2: Regional CERRA -->
+      <div class="mb-5">
+        <h3 class="title is-4 section-title">GraphMet with Regional Forecasting on CERRA domaine</h3>
+        <p class="muted">GraphMet at <strong>11&nbsp;km and 5.5&nbsp;km</strong> regional resolution over Europe. The Koopman processor preserves fine-scale orographic structure where deep GNN baselines produce smoothed output.</p>
+        <div class="columns is-variable is-2">
+          <div class="column">
+        <div class="figure-box">
+          <div class="image-comparison" style="position: relative; width: 100%; overflow: hidden; border-radius: 10px;">
+            <img src="static/images/cerra4x_0_in.png" alt="CERRA Input 11km" style="width: 100%; display: block;">
+            <img src="static/images/cerra4x_0_pred.png" alt="GraphMet 11km" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: ew-resize;" class="comparison-img">
+            <div class="comparison-slider" style="position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2c5ea8; cursor: ew-resize;"></div>
+          </div>
+          <div class="figure-caption">CERRA 11&nbsp;km Forecast — Input vs. GraphMet</div>
+        </div>
+          </div>
+          <div class="column">
+        <div class="figure-box">
+          <div class="image-comparison" style="position: relative; width: 100%; overflow: hidden; border-radius: 10px;">
+            <img src="static/images/cerra8x_0_in.png" alt="CERRA Input 5.5km" style="width: 100%; display: block;">
+            <img src="static/images/cerra8x_0_pred.png" alt="GraphMet 5.5km" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: ew-resize;" class="comparison-img">
+            <div class="comparison-slider" style="position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2c5ea8; cursor: ew-resize;"></div>
+          </div>
+          <div class="figure-caption">CERRA 5.5&nbsp;km Forecast — Input vs. GraphMet</div>
+        </div>
+          </div>
+          <div class="column">
+        <div class="figure-box">
+          <div class="image-comparison" style="position: relative; width: 100%; overflow: hidden; border-radius: 10px;">
+            <img src="static/images/cerra2x_0_in.png" alt="CERRA Input 22km" style="width: 100%; display: block;">
+            <img src="static/images/cerra2x_0_pred.png" alt="GraphMet 22km" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: ew-resize;" class="comparison-img">
+            <div class="comparison-slider" style="position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2c5ea8; cursor: ew-resize;"></div>
+          </div>
+          <div class="figure-caption">CERRA &nbsp;km Forecast — Input vs. GraphMet</div>
+        </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    
+  </section>
+
+  
+  <!-- ───────────────────────── MOTIVATION ───────────────────────── -->
+  <section class="section section-soft" id="motivation">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 section-title has-text-centered">Motivation: Where MLWP Models Lose High-Frequency Structure</h2>
+
+          <div class="content-card">
+            <div class="content">
+              <ul class="is-size-6">
+                <li>Modern MLWP models (<em>GraphCast, AIFS, Pangu-Weather, GenCast</em>) follow an encode-process-decode pipeline with a deep GNN processor at the Mesh2Mesh stage.</li>
+                <li>Each message-passing layer applies a row-stochastic aggregation matrix to node features, a local averaging operation. Repeating this \(L=16\) times per step is iterated averaging, formally proven to collapse Dirichlet energy and erase spatial structure.</li>
+                <li>Stacked across \(T=40\) autoregressive rollout steps, the contraction is catastrophic for mesoscale features (fronts, orographic precipitation, sea-breeze circulations).</li>
+                <li>This issue is commonly attributed to the MSE objective, but probabilistic / diffusion models (GenCast, GraphEFM, DiffLAM) exhibit the same failure — pointing to the <em>architecture</em> as the dominant cause.</li>
+              </ul>
+
+              <p class="is-size-6">
+                We formalize this through Koopman operator theory: the latent covariance condition number
+                \(\kappa(\mathbf{C}_\phi) = \lambda_{\max} / \lambda^{+}_{\min}\)
+                directly controls the Koopman approximation error. Deep processors drive \(\lambda^{+}_{\min} \to 0\), discarding precisely the short-lived mesoscale modes that govern regional weather.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── METHOD ───────────────────────── -->
+  <section class="section" id="method">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 section-title has-text-centered">Proposed Method</h2>
+
+      <div class="columns is-centered">
+        <div class="column is-full">
+          <div class="content has-text-justified is-size-6">
+
+            <p>
+              GraphMet keeps the same Grid-to-Mesh encoder as in GraphCast/GenCast, the same multi-scale icosahedral mesh, and the same Mesh-to-Grid decoder. The single architectural change is the <strong>Mesh2Mesh processor</strong>, which is replaced by a single linear Koopman step
+              \(\mathbf{z}^{t+1} = \mathbf{K}\,\mathbf{z}^{t}\), parameterised by a <strong>block-sparse matrix</strong> shared across the 14 edge-interaction types of the icosahedral mesh (12 directional + 2 land/ocean self-interactions). With \(m=32\), this gives <strong>only \(14\times 32^{2} = 14{,}336\) parameters</strong>, vs. \(\sim 10^{12}\) for a dense Koopman matrix.
+            </p>
+
+            <h3 class="title is-5 koopman-title mt-5">Block-Sparse Koopman Processor</h3>
+            <p>
+              The processor performs <strong>one matrix-vector multiplication</strong> in the spectral latent basis, with \(k=14\) shared sub-matrices \(\mathbf{K}_\alpha \in \mathbb{R}^{m\times m}\):
+            </p>
+            <div class="equation-box">
+              \[
+              \mathbf{z}_{i}^{\,t+1} \;=\; \sum_{(j,i)\in\mathcal{E}_M} \mathbf{K}_{\alpha_{ij}}\,\mathbf{z}_{j}^{\,t}
+              \]
+            </div>
+            <p>
+              Information propagates globally in <strong>one step</strong> thanks to the multi-mesh edge structure (refinements \(M_{0}\)–\(M_{6}\)), not through stacked local hops.
+            </p>
+
+            <h3 class="title is-5 spectral-title mt-5">Spectral Training Objective</h3>
+            <p>
+              A three-term loss jointly learns a stable Koopman basis (\(\mathcal{L}_{\mathrm{spec}}\)), preserves latent geometry (isotropy penalty \(R\)), and anchors the decoder in physical space (\(\mathcal{L}_{\mathrm{phys}}\)):
+            </p>
+            <div class="equation-box">
+              \[
+              \mathcal{J}(\boldsymbol{\phi},\mathbf{K}) \;=\; -\,\mathcal{L}_{\mathrm{spec}}(\boldsymbol{\phi}) \;+\; \xi_{1}\,\bigl[R(\hat{\mathbf{C}}_{\boldsymbol{\phi}}(t)) + R(\hat{\mathbf{C}}_{\boldsymbol{\phi}}(t{+}1))\bigr] \;+\; \xi_{2}\,\mathcal{L}_{\mathrm{phys}}(\boldsymbol{\phi},\mathbf{K})
+              \]
+            </div>
+            <p>
+              <strong>Eckart–Young–Mirsky optimality (Theorem 1):</strong> at the minimum, the encoder recovers the leading-\(r\) Koopman singular functions, and \(\mathbf{K}^{\star}\) has the true singular values \(\sigma_{1},\dots,\sigma_{r}\) on its diagonal.
+            </p>
+
+            <h3 class="title is-5 koopman-title mt-5">Analytic Probabilistic Forecasting via NCP</h3>
+            <p>
+              Because GraphMet explicitly recovers the Koopman left/right singular functions \(u_{i}, v_{i}\) and their decay rates \(\varsigma_{i}\), it integrates natively with the <strong>Neural Conditional Probability (NCP)</strong> framework. The transition density at lead time \(T\) admits the closed form:
+            </p>
+            <div class="equation-box">
+              \[
+              \mathbb{P}\bigl[\mathbf{z}^{\,t+T} \in B \,\big|\, \mathbf{z}^{\,t} = \mathbf{z}\bigr]
+              \;\approx\;
+              \int_{B} \Bigl(\,1 + \sum_{i=1}^{r} \varsigma_{i}^{\,T}\, u_{i}(\mathbf{z})\, v_{i}(\mathbf{z}')\,\Bigr)\, \mu(\mathrm{d}\mathbf{z}')
+              \]
+            </div>
+            <p>
+              Conditional variances, probabilistic tracks and quantiles are computed by integrating test functions against this density — <strong>no diffusion sampling, no ensemble generation</strong>.
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="content-card mt-4">
+        <h3 class="title is-5">From Global to Regional Forecasting (5&nbsp;km, CERRA)</h3>
+        <p class="muted">
+          GraphMet's shared global encoder/decoder produces CERRA-resolution outputs without boundary parameterisation. In comparison, diffusion-based limited-area models (Diffusion-LAM) degrade after 1 day without boundary conditions. GraphMet improves regional RMSE by <strong>11–14 %</strong> with better SSR.
+        </p>
+        <div class="figure-box mt-3 has-text-centered">
+          <img src="static/images/overview_graphmet_regional.png" alt="GraphMet regional ensemble realizations" style="width:95%; border-radius:10px;">
+          <div class="figure-caption">GraphMet regional module: high-resolution forecasting avoiding boundary parameterisation through the multi-scale mesh design.</div>
+        </div>
+      </div>
+
+      <!-- pipeline figure -->
+      <!-- <div class="columns is-centered mt-4">
+        <div class="column is-full">
+          <div class="figure-box has-text-centered">
+            <img src="static/images/global_to_regional.png"
+                 alt="GraphMet pipeline (global to regional)"
+                 style="width: min(82%, 1100px); border-radius: 10px; display: inline-block;">
+            <div class="figure-caption">
+              <strong>Global-to-Regional transfer.</strong> GraphMet shares its encoder/decoder across global ERA5 and regional CERRA (5 km). The multiscale mesh avoids boundary parameterisation, while boundary-based regional models (GraphLAM / RegionalGraphCast) rely on a finite domain with limited boundary information.
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+    </div>
+    
+  </section>
+
+  
+
+  <!-- ───────────────────────── RESULTS ───────────────────────── -->
+  <section class="section" id="results">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 section-title has-text-centered">Large Benchmark Forecast Results</h2>
+
+      <!-- Heatmap -->
+      <div class="content-card">
+        <h3 class="title is-5">Relative RMSE vs. IFS HRES — 1 to 25 forecast days</h3>
+        <p class="muted">GraphMet matches or improves the state-of-the-art across <strong>500 hPa geopotential, 850 hPa temperature, 700 hPa humidity, and 850 hPa wind speed</strong>. Blue = lower error than IFS HRES, red = higher.</p>
+        <div class="figure-box mt-3 has-text-centered">
+          <img src="static/images/graphmet_rmse_heatmap.png" alt="GraphMet Relative RMSE heatmap" style="width:95%; border-radius:10px;">
+          <div class="figure-caption">Relative RMSE (%) versus IFS HRES across baselines (Pangu, GraphCast, AIFS, GenCast) and GraphMet, for 4 representative variables and 25 forecast days.</div>
+        </div>
+      </div>
+
+
+                <!-- Block 3: Alps -->
+      <div class="mb-5">
+        <h3 class="title is-4 section-title">Mesoscale Forecasting — European Alps</h3>
+        <p class="muted">Zoom over the Alps, where complex orography produces particularly demanding high-frequency structure. GraphMet's Koopman processor retains these features that diffusive GNN processors smooth out.</p>
+        <div class="columns is-variable is-2">
+          <div class="column">
+        <div class="figure-box">
+          <div class="image-comparison" style="position: relative; width: 100%; aspect-ratio: 2/1; object-fit: cover; border-radius: 10px; display: block;">
+            <img src="static/images/cerra2x_alp0_in.png" alt="Alps Input 11km" style="width: 100%; display: block;">
+            <img src="static/images/cerra2x_alp0_pred.png" alt="Alps GraphMet 11km" style="position: absolute; top: 0; left: 0; width: 100%; cursor: ew-resize;" class="comparison-img">
+            <div class="comparison-slider" style="position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2c5ea8; cursor: ew-resize;"></div>
+          </div>
+          <div class="figure-caption">Alps — 11&nbsp;km</div>
+        </div>
+          </div>
+          <div class="column">
+        <div class="figure-box">
+          <div class="image-comparison" style="position: relative; width: 100%; aspect-ratio: 2/1; object-fit: cover; border-radius: 10px; display: block;">
+            <img src="static/images/cerra4x_alp0_in.png" alt="Alps Input 5.5km" style="width: 100%; display: block;">
+            <img src="static/images/cerra4x_alp0_pred.png" alt="Alps GraphMet 5.5km" style="position: absolute; top: 0; left: 0; width: 100%; cursor: ew-resize;" class="comparison-img">
+            <div class="comparison-slider" style="position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2c5ea8; cursor: ew-resize;"></div>
+          </div>
+          <div class="figure-caption">Alps — 5.5&nbsp;km</div>
+        </div>
+          </div>
+          <div class="column">
+        <div class="figure-box">
+          <div class="image-comparison" style="position: relative; width: 100%; aspect-ratio: 2/1; object-fit: cover; border-radius: 10px; display: block;">
+            <img src="static/images/cerra8x_alp0_in.png" alt="Alps Input 2.75km" style="width: 100%; display: block;">
+            <img src="static/images/cerra8x_alp0_pred.png" alt="Alps GraphMet 2.75km" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: ew-resize;" class="comparison-img">
+            <div class="comparison-slider" style="position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2c5ea8; cursor: ew-resize;"></div>
+          </div>
+          <div class="figure-caption">Alps — 2.75&nbsp;km</div>
+        </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 4: Multi-variable -->
+      <div class="mb-5">
+        <h3 class="title is-4 section-title">Multi-Variable Forecasting</h3>
+        <p class="muted">GraphMet jointly forecasts surface and pressure-level variables. We show 10&nbsp;m U-wind, 2&nbsp;m relative humidity, and surface pressure — where the topography signature is particularly strong.</p>
+        <div class="columns is-variable is-2">
+          <div class="column">
+            <div class="figure-box">
+              <div class="image-comparison" style="position: relative; width: 100%; overflow: hidden; border-radius: 10px;">
+                <img src="static/images/0_10m_u_component_of_wind-in.png" alt="10u Input" style="width: 100%; display: block;">
+                <img src="static/images/0_10m_u_component_of_wind-pred.png" alt="GraphMet 10u" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: ew-resize;" class="comparison-img">
+                <div class="comparison-slider" style="position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2c5ea8; cursor: ew-resize;"></div>
+              </div>
+              <div class="figure-caption">10&nbsp;m U-Wind</div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="figure-box">
+              <div class="image-comparison" style="position: relative; width: 100%; overflow: hidden; border-radius: 10px;">
+                <img src="static/images/0_2m_relative_humidity-in.png" alt="Rh2m Input" style="width: 100%; display: block;">
+                <img src="static/images/0_2m_relative_humidity-pred.png" alt="GraphMet Rh2m" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: ew-resize;" class="comparison-img">
+                <div class="comparison-slider" style="position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2c5ea8; cursor: ew-resize;"></div>
+              </div>
+              <div class="figure-caption">2&nbsp;m Relative Humidity</div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="figure-box">
+              <div class="image-comparison" style="position: relative; width: 105%; overflow: hidden; border-radius: 10px;">
+                <img src="static/images/0_surface_pressure-in.png" alt="Surface Pressure Input" style="width: 100%; display: block;">
+                <img src="static/images/0_surface_pressure-pred.png" alt="GraphMet Surface Pressure" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: ew-resize;" class="comparison-img">
+                <div class="comparison-slider" style="position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2c5ea8; cursor: ew-resize;"></div>
+              </div>
+              <div class="figure-caption">Surface Pressure</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+
+      <!-- Two columns: ablation + per-variable -->
+      <div class="columns is-variable is-5 mt-4">
+        <div class="column">
+          <div class="content-card">
+            <h3 class="title is-5">Across processor variants (Ablation A1)</h3>
+            <p class="muted">Increasing message-passing depth collapses the latent covariance (\(\lambda^{+}_{\min}\)) regardless of the loss. The Koopman processor recovers \(\lambda^{+}_{\min} = 0.83\) vs. \(10^{-2}\) for deep MP — confirming the bottleneck is architectural.</p>
+            <div class="figure-box mt-3 has-text-centered">
+              <img src="static/images/ablation_a1.png" alt="RMSE evolution across processor depths" style="width:92%; border-radius:10px;">
+              <div class="figure-caption">RMSE evolution with rollout horizon: deep MP > shallow MP > GraphMet (Koopman).</div>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="content-card">
+            <h3 class="title is-5">Spectral skill — RMSE / CRPS / SSR</h3>
+            <p class="muted">Across 0–2.5 days, GraphMet is <strong>jointly lower in RMSE and CRPS</strong> while staying close to the perfect-calibration line on SSR. The green band shows the ensemble gain from 5→50 members.</p>
+            <div class="figure-box mt-3 has-text-centered">
+              <img src="static/images/rmse_crps_ssr.png" alt="RMSE / CRPS / SSR" style="width:92%; border-radius:10px;">
+              <div class="figure-caption">Joint deterministic + probabilistic skill across global and regional settings.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="content-card mt-4">
+        <h3 class="title is-5">Probabilistic Skill: RMSE, CRPS, SSR and Ensemble Realisations</h3>
+        <p class="muted">
+          GraphMet ensembles (right) reproduce realistic variability close to ERA5, while remaining calibrated (SSR ≈ 1). Diffusion-LAM without boundary conditions degrades after 1 day, highlighting the benefit of GraphMet's multi-scale Koopman operator.
+        </p>
+        <div class="figure-box mt-3 has-text-centered">
+          <img src="static/images/overview_graphmet_ensemble.png" alt="Ensemble realizations" style="width:96%; border-radius:10px;">
+          <div class="figure-caption">RMSE / CRPS / SSR over 0–2.5 days plus ensemble realisations for GraphMet (50 members) vs. ERA5.</div>
+        </div>
+      </div>
+
+      <!-- Cyclone Narelle -->
+      <!-- Cyclone Narelle -->
+      <div class="content-card mt-4">
+
+        <h3 class="title is-5">Probabilistic Tropical-Cyclone Forecasting</h3>
+
+        <p class="muted">
+          GraphMet-ENS provides 50-member analytic ensemble tracks for <strong>Tropical Cyclone Narelle (Australia, March 2026)</strong>.
+          Without diffusion sampling, GraphMet recovers a comparable ensemble spread to ECMWF-ENS at a fraction of the compute cost.
+        </p>
+
+        <!-- Two-image comparison -->
+        <div class="columns mt-3">
+
+          <!-- IFS / ECMWF ENS -->
+          <div class="column has-text-centered">
+            <div class="figure-box">
+              <img src="static/images/track_IFS_ens.png"
+                  alt="ECMWF ENS Tropical Cyclone Narelle tracks"
+                  style="width:100%; border-radius:10px;">
+
+              <div class="figure-caption">
+                ECMWF-ENS + deterministic IFS track (black).
+              </div>
+            </div>
+          </div>
+
+          <!-- GraphMet ENS -->
+          <div class="column has-text-centered">
+            <div class="figure-box">
+              <img src="static/images/track_graphmet.png"
+                  alt="GraphMet ENS Tropical Cyclone Narelle tracks"
+                  style="width:100%; border-radius:10px;">
+
+              <div class="figure-caption">
+                GraphMet-ENS analytic ensemble tracks + deterministic IFS track (black).
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ───────────────────────── VISUALIZATIONS ───────────────────────── -->
+  <section class="section section-soft" id="analysis">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 section-title has-text-centered">Visualizations</h2>
+
+      <!-- Block 1: Global ERA5 -->
+      <div class="mb-5">
+        <h3 class="title is-4 section-title">Global Forecasting — ERA5</h3>
+        <p class="muted">Interactive sliders compare the <strong>GraphMet forecast</strong> against the corresponding input field. Drag the vertical line.</p>
+        <div class="columns is-variable is-2">
+          <div class="column">
+        <div class="figure-box">
+          <div class="image-comparison" style="position: relative; width: 100%; overflow: hidden; border-radius: 10px;">
+            <img src="static/images/era5_4_in.png" alt="ERA5 Input 1" style="width: 100%; display: block;">
+            <img src="static/images/era5_4_pred.png" alt="GraphMet Forecast 1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: ew-resize;" class="comparison-img">
+            <div class="comparison-slider" style="position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2c5ea8; cursor: ew-resize;"></div>
+          </div>
+          <div class="figure-caption">ERA5 Global Forecast — Input (left) vs. GraphMet prediction (right)</div>
+        </div>
+          </div>
+          <div class="column">
+        <div class="figure-box">
+          <div class="image-comparison" style="position: relative; width: 100%; overflow: hidden; border-radius: 10px;">
+            <img src="static/images/era5_1324_in.png" alt="ERA5 Input 2" style="width: 100%; display: block;">
+            <img src="static/images/era5_1324_pred.png" alt="GraphMet Forecast 2" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: ew-resize;" class="comparison-img">
+            <div class="comparison-slider" style="position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #2c5ea8; cursor: ew-resize;"></div>
+          </div>
+          <div class="figure-caption">ERA5 Global Forecast — Input (left) vs. GraphMet prediction (right)</div>
+        </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Animation: 500 hPa wind rollout -->
+      <div class="mb-5">
+        <h3 class="title is-4 section-title">Rollout Animation — \(u_{500}\) Wind Field</h3>
+        <p class="muted">
+          Autoregressive GraphMet rollout of the 500&nbsp;hPa zonal wind. The single Koopman step preserves fine-scale spectral structure across the multi-day forecast horizon.
+        </p>
+        <div class="figure-box mt-3 has-text-centered">
+          <video controls loop muted playsinline preload="metadata"
+                 style="width:100%; max-width:1100px; border-radius:10px; display:inline-block;">
+            <source src="static/images/u500_animation.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="figure-caption">GraphMet autoregressive forecast of \(u_{500}\) — multi-day rollout.</div>
+        </div>
+      </div>
+
+      <!-- Per-variable regional galleries -->
+      <div class="mb-5">
+        <h3 class="title is-4 section-title">Per-Variable Regional Snapshots</h3>
+        <div class="columns is-variable is-3">
+          <div class="column">
+            <div class="figure-box">
+              <img src="static/images/graphmet_t2m_eu.png" alt="t2m Europe" style="width:100%; border-radius:10px;">
+              <div class="figure-caption">2&nbsp;m Temperature — Europe</div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="figure-box">
+              <img src="static/images/graphmet_t2m_us.png" alt="t2m US" style="width:100%; border-radius:10px;">
+              <div class="figure-caption">2&nbsp;m Temperature — Continental US</div>
+            </div>
+          </div>
+        </div>
+        <div class="columns is-variable is-3 mt-2">
+          <div class="column">
+            <div class="figure-box">
+              <img src="static/images/graphmet_u10_eu.png" alt="u10 Europe" style="width:100%; border-radius:10px;">
+              <div class="figure-caption">10&nbsp;m U-Wind — Europe</div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="figure-box">
+              <img src="static/images/graphmet_u10_us.png" alt="u10 US" style="width:100%; border-radius:10px;">
+              <div class="figure-caption">10&nbsp;m U-Wind — Continental US</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Case study + forecasting -->
+      <div class="mb-5">
+        <h3 class="title is-4 section-title">Case Studies and Long-Range Forecasting</h3>
+        <div class="columns is-variable is-3">
+          <div class="column">
+            <div class="figure-box">
+              <img src="static/images/graphmet_forecasting.png" alt="GraphMet long-range" style="width:100%; border-radius:10px;">
+              <div class="figure-caption">Long-range GraphMet forecast roll-out (up to 15 days) showing preserved spectral content.</div>
+            </div>
+          </div>
+        </div>
+        <div class="columns is-variable is-3 mt-2">
+          <div class="column">
+            <div class="figure-box">
+              <img src="static/images/graphmet_ens.png" alt="GraphMet ensemble" style="width:100%; border-radius:10px;">
+              <div class="figure-caption">GraphMet-ENS analytic ensemble (NCP-based), 50 members, regional 5&nbsp;km.</div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="figure-box">
+              <img src="static/images/weather_extrapolation.png" alt="Weather extrapolation TL63" style="width:100%; border-radius:10px;">
+              <div class="figure-caption">Weather extrapolation experiment (TL63 trained on year 2000): the Koopman operator extrapolates robustly outside the training horizon.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Lightbox overlay (click any image to zoom) ───────────────── -->
+  <div id="lightbox-overlay" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <button id="lightbox-close" aria-label="Close (Esc)">&times;</button>
+    <img id="lightbox-img" src="" alt="">
+    <div id="lightbox-caption"></div>
+  </div>
+
+  <script>
+    /* Comparison sliders (Input vs GraphMet prediction) */
+    document.querySelectorAll('.image-comparison').forEach(container => {
+      const slider = container.querySelector('.comparison-slider');
+      const srImage = container.querySelector('.comparison-img');
+
+      const updateSlider = (e) => {
+        const rect = container.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        if (e.touches) x = e.touches[0].clientX - rect.left;
+        x = Math.max(0, Math.min(x, rect.width));
+
+        slider.style.left = x + 'px';
+        srImage.style.clipPath = `inset(0 ${100 - (x / rect.width) * 100}% 0 0)`;
+      };
+
+      container.addEventListener('mousemove', updateSlider);
+      container.addEventListener('touchmove', updateSlider);
+      container.addEventListener('mousedown', () => {
+        container.addEventListener('mousemove', updateSlider);
+      });
+      container.addEventListener('mouseup', () => {
+        container.removeEventListener('mousemove', updateSlider);
+      });
+    });
+
+    /* Click-to-zoom lightbox */
+    (function () {
+      const overlay = document.getElementById('lightbox-overlay');
+      const lbImg   = document.getElementById('lightbox-img');
+      const lbCap   = document.getElementById('lightbox-caption');
+      const lbClose = document.getElementById('lightbox-close');
+
+      function openLightbox(src, caption) {
+        lbImg.src = src;
+        lbImg.classList.remove('is-zoomed');
+        lbCap.textContent = caption || '';
+        lbCap.style.display = caption ? 'block' : 'none';
+        overlay.classList.add('is-active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeLightbox() {
+        overlay.classList.remove('is-active');
+        lbImg.src = '';
+        lbImg.classList.remove('is-zoomed');
+        document.body.style.overflow = '';
+      }
+
+      /* Bind to all standalone images inside .figure-box / .content-card,
+         excluding comparison-slider images (they have their own UI). */
+      document.querySelectorAll('.figure-box img, .content-card img').forEach(img => {
+        if (img.closest('.image-comparison')) return;
+        img.addEventListener('click', () => {
+          const box = img.closest('.figure-box, .content-card');
+          const cap = box ? box.querySelector('.figure-caption') : null;
+          openLightbox(img.src, cap ? cap.textContent.trim() : img.alt);
+        });
+      });
+
+      /* Click image again to toggle native 100% zoom */
+      lbImg.addEventListener('click', (e) => {
+        e.stopPropagation();
+        lbImg.classList.toggle('is-zoomed');
+      });
+
+      overlay.addEventListener('click', closeLightbox);
+      lbClose.addEventListener('click', (e) => { e.stopPropagation(); closeLightbox(); });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('is-active')) closeLightbox();
+      });
+    })();
+  </script>
+
+  <!-- ───────────────────────── BIBTEX ───────────────────────── -->
+  <section class="section" id="bibtex">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 section-title has-text-centered">BibTeX</h2>
+      <div class="content-card">
+<pre><code>@inproceedings{
+anonymous2026graphmet,
+title={GraphMet: Learning Spectral Compositional Koopman Operators for Global-to-Regional Weather Forecasting},
+author={Anonymous Authors},
+booktitle={Under Review},
+year={2026},
+url={https://anonymous.4open.science/w/GraphMet-54ED/}
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container is-max-desktop">
+      <div class="content has-text-centered is-size-6 muted">
+        <p>
+          Anonymous submission — page provided for double-blind review.<br/>
+          Licensed under a <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+        </p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
