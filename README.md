@@ -5,9 +5,8 @@ Official anonymous implementation of the paper:
 
 Anonymous code repository: <https://anonymous.4open.science/w/GraphMet-54ED/>
 
----
 
-## 📘 Introduction
+
 
 State-of-the-art Machine Learning Weather Prediction (MLWP) systems such as
 GraphCast, AIFS, Pangu-Weather, and GenCast achieve strong upper-air forecast
@@ -43,9 +42,8 @@ improves the **regional RMSE by 11–14 %** at 5 km resolution, and reaches
 competitive CRPS at **≈ 14× lower inference cost** than the strongest
 diffusion-based baselines.
 
----
 
-## 🧰 Installation
+## Installation
 
 Clone the (anonymous) repository:
 
@@ -67,9 +65,8 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
----
 
-## 📦 Datasets
+## Load Datasets
 
 GraphMet is trained and evaluated on standard reanalysis datasets used by the
 MLWP community.
@@ -97,27 +94,8 @@ at **5.5 km** resolution over the European domain
 - **Train / Val:** 2010 – 2020
 - **Test:** 2022
 
-#### Dataset structure
 
-The expected directory layout is:
-
-```
-dataset/
-├── era5/
-│   ├── train/
-│   ├── val/
-│   └── test/
-└── cerra/
-    ├── train/
-    ├── val/
-    └── test/
-```
-
-Preprocessing scripts can be found in `tools/`.
-
----
-
-## 🧠 Supported Models
+## Supported Models
 
 To our knowledge, **GraphMet provides one of the most comprehensive benchmark
 toolboxes for graph-based weather forecasting**, covering deterministic and
@@ -143,9 +121,8 @@ diffusion-based** weather models.
 - **Probabilistic baselines:** GenCast, GraphEFM, DiffLAM
 - **GraphMet variants:** the framework supports both **GraphMet** (deterministic) and **GraphMet-ENS** (probabilistic, NCP-based) without retraining the encoder/decoder.
 
----
 
-## 🧪 Training Objective
+## Training Objective
 
 GraphMet is trained with a **three-term spectral objective**:
 
@@ -166,9 +143,8 @@ minimum, the encoder recovers the leading-$r$ Koopman singular functions and
 the learned matrix $\mathbf{K}^\star$ has the true singular values
 $\sigma_1,\dots,\sigma_r$ on its diagonal.
 
----
 
-## 🚀 Usage
+## How to use
 
 ### Stage 1 — Global Pretraining on ERA5
 
@@ -226,9 +202,7 @@ python experiments/forecasting/ncp_inference.py \
     --lead-time=120
 ```
 
----
-
-## 📈 Highlights of Results
+## Highlights of Results
 
 - **15-day activity deficit reduced by 32 %** (vs. GraphCast).
 - **Regional RMSE improvement of 11–14 %** at 5.5 km on the CERRA domain.
@@ -240,23 +214,3 @@ python experiments/forecasting/ncp_inference.py \
 - **Native probabilistic forecasting** via the NCP closed-form transition
   density, without ensemble sampling.
 
----
-
-## 📑 Citation
-
-If you find GraphMet useful in your research, please cite (anonymous version):
-
-```bibtex
-@inproceedings{
-anonymous2026graphmet,
-title={GraphMet: Learning Spectral Compositional Koopman Operators for Global-to-Regional Weather Forecasting},
-author={Anonymous Authors},
-booktitle={Under Review},
-year={2026},
-url={https://anonymous.4open.science/w/GraphMet-54ED/}
-}
-```
-
----
-
-⭐ If you find this repository useful, please consider starring it!
